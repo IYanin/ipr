@@ -1,0 +1,39 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+title "Диаграмма последовательности МОМ-АМТ-МОМ"
+autonumber
+
+actor "Сотрудник ДУТК" as catman
+database MOM
+database AMT
+
+
+catman -> MOM: Заводит справочники\nдля МОМ
+note right
+  Предположительно, возможно
+  за справочники отвечают другие
+  сотрудники, на пример ОВМ
+end note
+loop Раз в день
+    AMT -> MOM: Запрос вьюх\nсо справочниками
+    MOM --> AMT:  Передача вьюх\nсо справочниками
+    AMT -> AMT: Формирование\nсправочников АМТ
+end loop
+catman -> POS_editor: Создание POS материалов\n(Шаблоны для ОП и ЭО)
+AMT <-- POS_editor: Сохранение POS
+catman -> Template: Размещение POS
+AMT <-- Template: Сохранение связей POS с ПП и ШП
+AMT -> AMT: Формирование вьюх для МОМ
+loop Раз в день
+    MOM -> AMT: Запрос вьюх
+    AMT --> MOM: Передача вьюх
+    MOM -> MOM: Формирование шаблонов\nдля пользователей по вьюхам
+end loop
+catman -> MOM: Создание "Живых" ОП и ЭО
+loop Раз в день
+    AMT -> MOM: Запрос вьюх\n"Живых" ОП и ЭО
+    MOM --> AMT: Предоставление вьюх\n"Живых" ОП и ЭО
+    AMT -> AMT: Подмена на ШП\nPOS на "Живые" ОП и ЭО
+end loop
+
+@enduml
